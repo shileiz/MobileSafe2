@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zsl.android.mobilesafe.R;
-import com.zsl.android.mobilesafe.application.BaseApplication;
 import com.zsl.android.mobilesafe.utils.StreamUtils;
 
 import org.json.JSONException;
@@ -52,8 +51,8 @@ public class SplashActivity extends Activity {
 
     // 其他
     private final String mSavePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MobileSafe" + File.separator;
-    private static final  int MY_WRITE_EXTERNAL_STORAGE = 0;
-    private boolean mSdcardReady = false;
+    private boolean mSavePathReady = false;
+    private static final int MY_WRITE_EXTERNAL_STORAGE = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -72,25 +71,40 @@ public class SplashActivity extends Activity {
         }
     };
 
+    /*
+    * sdcard 创建目录
+    * */
     private void initEnv() {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File path = new File(mSavePath);
             if (!path.exists()) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            MY_WRITE_EXTERNAL_STORAGE);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_WRITE_EXTERNAL_STORAGE);
+                    // Activity 的 onRequestPermissionsResult() 将被回调
+                }
+            } else {
+                mSavePathReady = true;
+            }
+        }
+    }
 
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    File path = new File(mSavePath);
+                    if (path.mkdirs()) {
+                        mSavePathReady = true;
+                    } else {
+                        mSavePathReady = false;
+                        Log.d("zslzsl", "mkdir failed: " + mSavePath);
+                    }
+                } else {
+                    mSavePathReady = false;
                 }
-                if(path.mkdirs()){
-                    mSdcardReady = true;
-                }else {
-                    Log.d("zslzsl","mkdir failed: "+mSavePath);
-                }
+                return;
             }
         }
     }
@@ -116,11 +130,13 @@ public class SplashActivity extends Activity {
     }
 
     private void download() {
-        if (mSdcardReady) {
+        if (mSavePathReady) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setMessage("亲，努力下载中。。。");
             RequestParams params = new RequestParams(mDownloadUrl);
             params.setSaveFilePath(mSavePath);
-            x.http().get(params, new Callback.ProgressCallback<String>() {
+            x.http().get(params, new Callback.ProgressCallback<File>() {
                 @Override
                 public void onWaiting() {
                 }
@@ -131,39 +147,43 @@ public class SplashActivity extends Activity {
 
                 @Override
                 public void onLoading(long total, long current, boolean isDownloading) {
-                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                    progressDialog.setMessage("亲，努力下载中。。。");
-                    progressDialog.show();
-                    progressDialog.setMax((int) total);
-                    progressDialog.setProgress((int) current);
+                    if(isDownloading) {
+                        Log.d("zslzsl", "onLoading");
+                        progressDialog.setMax((int) total);
+                        progressDialog.setProgress((int) current);
+                        progressDialog.show();
+                    }
                 }
 
                 @Override
-                public void onSuccess(String result) {
-                    Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                public void onSuccess(File result) {
+                    Toast.makeText(SplashActivity.this, "下载成功", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                     enterHome();
                 }
 
                 @Override
                 public void onError(Throwable ex, boolean isOnCallback) {
-                    Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(SplashActivity.this, "xUtils onError", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                     enterHome();
                 }
 
                 @Override
                 public void onCancelled(CancelledException cex) {
-                    Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SplashActivity.this, "cancelled", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                     enterHome();
                 }
 
                 @Override
                 public void onFinished() {
+                    Toast.makeText(SplashActivity.this, "onFinished", Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                    enterHome();
                 }
             });
-        }else{
+        } else {
             Toast.makeText(this, "Sdcard is not ready!", Toast.LENGTH_LONG).show();
             enterHome();
         }
@@ -182,6 +202,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_main);
         tvVersion = (TextView) findViewById(R.id.tv_version);
         tvVersion.setText("当前版本：" + getVersionName());
+        initEnv();
         checkVersion();
     }
 
