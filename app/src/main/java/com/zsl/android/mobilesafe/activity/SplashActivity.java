@@ -8,12 +8,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class SplashActivity extends Activity {
     // Handler 消息
     private final int CODE_UPDATE_DIALOG = 1;
     private final int CODE_NET_ERROR = 2;
+    private final int CODE_ENTER_HOME = 3;
 
     // 服务器信息
     private int mVersionCode;
@@ -50,9 +54,9 @@ public class SplashActivity extends Activity {
     private TextView tvVersion;
 
     // 其他
-    private final String mSavePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MobileSafe" + File.separator;
-    private boolean mSavePathReady = false;
-    private static final int MY_WRITE_EXTERNAL_STORAGE = 0;
+    private final String mDownloadPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MobileSafe" + File.separator;
+    private boolean mSdcardGranted = false;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -65,6 +69,8 @@ public class SplashActivity extends Activity {
                     Toast.makeText(SplashActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
                     enterHome();
                     break;
+                case CODE_ENTER_HOME:
+                    enterHome();
                 default:
                     break;
             }
@@ -75,38 +81,38 @@ public class SplashActivity extends Activity {
     * sdcard 创建目录
     * */
     private void initEnv() {
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File path = new File(mSavePath);
-            if (!path.exists()) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_WRITE_EXTERNAL_STORAGE);
-                    // Activity 的 onRequestPermissionsResult() 将被回调
-                }
-            } else {
-                mSavePathReady = true;
+        // 检查用户是否已经允许过了，如果没有允许则弹窗请求
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(SplashActivity.this, "Request sdcard Now!", Toast.LENGTH_SHORT).show();
+            // 动态请求 sdcard 写权限，会弹窗
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    /*
+    * 动态请求 sdcard 写权限的回调
+    * */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_WRITE_EXTERNAL_STORAGE: {
+                int grantResult = grantResults[0];
+                boolean granted = grantResult == PackageManager.PERMISSION_GRANTED;
+                if (granted)
+                    mSdcardGranted = true;
+                else mSdcardGranted = false;
+                Toast.makeText(SplashActivity.this, "Sdcard grant result: "+granted, Toast.LENGTH_SHORT).show();
+                return;
             }
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_WRITE_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    File path = new File(mSavePath);
-                    if (path.mkdirs()) {
-                        mSavePathReady = true;
-                    } else {
-                        mSavePathReady = false;
-                        Log.d("zslzsl", "mkdir failed: " + mSavePath);
-                    }
-                } else {
-                    mSavePathReady = false;
-                }
-                return;
-            }
-        }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        enterHome();
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void showUpdateDialog() {
@@ -130,12 +136,13 @@ public class SplashActivity extends Activity {
     }
 
     private void download() {
-        if (mSavePathReady) {
+        if (mSdcardGranted) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressDialog.setMessage("亲，努力下载中。。。");
+            progressDialog.setMessage("下载中...");
+            progressDialog.show();
             RequestParams params = new RequestParams(mDownloadUrl);
-            params.setSaveFilePath(mSavePath);
+            params.setSaveFilePath(mDownloadPath + "mobilesafe" + mVersionName + ".apk");
             x.http().get(params, new Callback.ProgressCallback<File>() {
                 @Override
                 public void onWaiting() {
@@ -147,11 +154,9 @@ public class SplashActivity extends Activity {
 
                 @Override
                 public void onLoading(long total, long current, boolean isDownloading) {
-                    if(isDownloading) {
-                        Log.d("zslzsl", "onLoading");
+                    if (isDownloading) {
                         progressDialog.setMax((int) total);
                         progressDialog.setProgress((int) current);
-                        progressDialog.show();
                     }
                 }
 
@@ -159,32 +164,40 @@ public class SplashActivity extends Activity {
                 public void onSuccess(File result) {
                     Toast.makeText(SplashActivity.this, "下载成功", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
-                    enterHome();
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Uri uri;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        uri = FileProvider.getUriForFile(SplashActivity.this, "com.zsl.android.mobilesafe.fileProvider", result);
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        uri = Uri.fromFile(result);
+                    }
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                    startActivityForResult(intent, 0);
                 }
 
                 @Override
                 public void onError(Throwable ex, boolean isOnCallback) {
-                    Toast.makeText(SplashActivity.this, "xUtils onError", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SplashActivity.this, "xUtils onError" + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.d("zslzsl", ex.getMessage());
                     progressDialog.dismiss();
                     enterHome();
                 }
 
                 @Override
                 public void onCancelled(CancelledException cex) {
-                    Toast.makeText(SplashActivity.this, "cancelled", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SplashActivity.this, "xUtils cancelled", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                     enterHome();
                 }
 
                 @Override
                 public void onFinished() {
-                    Toast.makeText(SplashActivity.this, "onFinished", Toast.LENGTH_LONG).show();
-                    progressDialog.dismiss();
-                    enterHome();
                 }
             });
         } else {
-            Toast.makeText(this, "Sdcard is not ready!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Sdcard is not Granted!", Toast.LENGTH_LONG).show();
             enterHome();
         }
     }
@@ -229,6 +242,7 @@ public class SplashActivity extends Activity {
     }
 
     private void checkVersion() {
+        final long startTime = System.currentTimeMillis();
         new Thread() {
             Message message = Message.obtain();
 
@@ -238,8 +252,8 @@ public class SplashActivity extends Activity {
                     URL url = new URL("http://www.zsllsz.com/mobilesafe/update.json");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(3000);
-                    connection.setReadTimeout(5000);
+                    connection.setConnectTimeout(2000);
+                    connection.setReadTimeout(2000);
                     connection.connect();
                     int responseCode = connection.getResponseCode();
                     if (responseCode == 200) {
@@ -252,15 +266,26 @@ public class SplashActivity extends Activity {
                         mDownloadUrl = jo.getString("downloadUrl");
                         if (mVersionCode > getVersionCode()) {
                             message.what = CODE_UPDATE_DIALOG;
+                        }else {
+                            message.what = CODE_ENTER_HOME;
                         }
                     }
                 } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    message.what = CODE_NET_ERROR;
                 } catch (IOException e) {
                     message.what = CODE_NET_ERROR;
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    message.what = CODE_NET_ERROR;
                 } finally {
+                    long endTIme = System.currentTimeMillis();
+                    long timeUsed = endTIme - startTime;
+                    if (timeUsed < 2000) {
+                        try {
+                            Thread.sleep(2000 - timeUsed);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     mHandler.sendMessage(message);
                 }
             }

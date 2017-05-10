@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    android:orientation="vertical"
     tools:context="com.zsl.android.mobilesafe.activity.HomeActivity">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Home"/>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="功能列表"
+        android:textSize="45sp" />
+
+    <TextView
+        android:id="@+id/tv_marquee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:singleLine="true"
+        android:text="跑马灯。。。。。很长很长很长。。。。。跑啊跑跑啊跑。。。~~~~"
+        android:textColor="@color/colorBlack"
+        android:textSize="20sp" />
+
+    <GridView
+        android:id="@+id/gv_home"
+        android:layout_width="match_parent"
+        android:numColumns="3"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:verticalSpacing="20dp"/>
+
+</LinearLayout>
