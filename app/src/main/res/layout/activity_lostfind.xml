@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zsl.android.mobilesafe.activity.LostfindActivity">
+
+    <TextView
+        style="@style/TitleStyle"
+        android:text="手机防盗" />
+
+</LinearLayout>

@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,6 +19,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,17 +79,22 @@ public class SplashActivity extends Activity {
             }
         }
     };
+    private SharedPreferences mPerf;
+    private View rlRoot;
 
     /*
     * sdcard 创建目录
     * */
-    private void initEnv() {
+    private void checkSdcard() {
         // 检查用户是否已经允许过了，如果没有允许则弹窗请求
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(SplashActivity.this, "Request sdcard Now!", Toast.LENGTH_SHORT).show();
             // 动态请求 sdcard 写权限，会弹窗
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+        }else{
+            // 低版本 SDK 不需要动态请求权限，如果安装apk成功说明已经获得了权限
+            mSdcardGranted = true;
         }
     }
 
@@ -97,15 +105,14 @@ public class SplashActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_WRITE_EXTERNAL_STORAGE: {
+            case REQUEST_WRITE_EXTERNAL_STORAGE:
                 int grantResult = grantResults[0];
                 boolean granted = grantResult == PackageManager.PERMISSION_GRANTED;
                 if (granted)
                     mSdcardGranted = true;
                 else mSdcardGranted = false;
-                Toast.makeText(SplashActivity.this, "Sdcard grant result: "+granted, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SplashActivity.this, "Sdcard grant result: " + granted, Toast.LENGTH_SHORT).show();
                 return;
-            }
         }
     }
 
@@ -213,10 +220,23 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkSdcard();
+
         tvVersion = (TextView) findViewById(R.id.tv_version);
+        rlRoot = findViewById(R.id.rl_root);
+
         tvVersion.setText("当前版本：" + getVersionName());
-        initEnv();
-        checkVersion();
+        AlphaAnimation anim = new AlphaAnimation(0.3f, 1f);
+        anim.setDuration(2000);
+        rlRoot.setAnimation(anim);
+
+        mPerf = getSharedPreferences("config", MODE_PRIVATE);
+        boolean autoUpdate = mPerf.getBoolean("AutoUpdate", true);
+
+        if (autoUpdate)
+            checkVersion();
+        else mHandler.sendEmptyMessageDelayed(CODE_ENTER_HOME, 2000);
+
     }
 
     private String getVersionName() {
@@ -266,7 +286,7 @@ public class SplashActivity extends Activity {
                         mDownloadUrl = jo.getString("downloadUrl");
                         if (mVersionCode > getVersionCode()) {
                             message.what = CODE_UPDATE_DIALOG;
-                        }else {
+                        } else {
                             message.what = CODE_ENTER_HOME;
                         }
                     }

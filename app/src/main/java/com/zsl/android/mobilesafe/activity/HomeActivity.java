@@ -18,6 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zsl.android.mobilesafe.R;
+import com.zsl.android.mobilesafe.utils.MD5Utils;
+
+import java.util.Set;
 
 public class HomeActivity extends Activity {
 
@@ -95,9 +98,9 @@ public class HomeActivity extends Activity {
 
     private void showPasswordDialog() {
         String savedPassword = mPerf.getString("password", null);
-        if(savedPassword != null){
+        if (savedPassword != null) {
             showInputPasswordDialog();
-        }else {
+        } else {
             showSetPasswordDialog();
         }
     }
@@ -123,9 +126,10 @@ public class HomeActivity extends Activity {
                     Toast.makeText(HomeActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
                 else {
                     String savedPassword = mPerf.getString("password", null);
+                    password = MD5Utils.encode(password);
                     if (password.equals(savedPassword)) {
                         dialog.dismiss();
-                        // 进入界面
+                        startActivity(new Intent(HomeActivity.this, LostfindActivity.class));
                     } else Toast.makeText(HomeActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -158,8 +162,10 @@ public class HomeActivity extends Activity {
                     Toast.makeText(HomeActivity.this, "不能为空", Toast.LENGTH_SHORT).show();
                 else {
                     if (password.equals(confirmPassword)) {
+                        password = MD5Utils.encode(password);
                         mPerf.edit().putString("password", password).apply();
                         dialog.dismiss();
+                        startActivity(new Intent(HomeActivity.this, LostfindActivity.class));
                     } else Toast.makeText(HomeActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
                 }
             }

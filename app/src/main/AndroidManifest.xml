@@ -20,10 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.HomeActivity" />
-        <activity
-            android:name=".activity.SettingActivity" />
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.SettingActivity" />
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.zsl.android.mobilesafe.fileProvider"
@@ -34,6 +33,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity android:name=".activity.LostfindActivity" />
+        <activity android:name=".activity.Setup1Activity" />
+        <activity android:name=".activity.Setup2Activity" />
+        <activity android:name=".activity.Setup3Activity" />
+        <activity android:name=".activity.Setup4Activity"></activity>
     </application>
 
 </manifest>
