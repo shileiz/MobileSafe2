@@ -4,6 +4,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.zsl.android.mobilesafe.activity.Setup4Activity">
+    android:orientation="vertical"
+    tools:context="com.zsl.android.mobilesafe.activity.Setup3Activity">
+
+    <TextView
+        style="@style/TitleStyle"
+        android:text="完成设置" />
+
+    <com.zsl.android.mobilesafe.view.SettingItemView
+        android:id="@+id/siv_turn_on"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:subtitle_off="暂不开启手机防盗功能"
+        app:subtitle_on="立刻开启是手机防盗功能"
+        app:title="现在开启"
+        android:onClick="turnOn"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="15dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/presence_offline" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/presence_offline" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/presence_online" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/presence_offline" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/setup3" />
+
+        <Button
+            android:id="@+id/btn_next"
+            style="@style/NextButton"
+            android:text="完成设置" />
+
+        <Button style="@style/PreviousButton" />
+
+    </RelativeLayout>
 
 </LinearLayout>

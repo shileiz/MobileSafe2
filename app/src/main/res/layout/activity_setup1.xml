@@ -73,13 +73,7 @@
             app:srcCompat="@drawable/setup1" />
 
         <Button
-            android:id="@+id/btn_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="下一步" />
+           style="@style/NextButton"/>
 
     </RelativeLayout>
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:myattr="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -26,9 +25,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
-        myattr:subtitle_off="sim 卡未绑定"
-        myattr:subtitle_on="sim 卡已绑定"
-        myattr:title="绑定 sim 卡" />
+        android:onClick="simClick"
+        app:subtitle_off="sim 卡未绑定"
+        app:subtitle_on="sim 卡已绑定"
+        app:title="绑定 sim 卡" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -71,23 +71,9 @@
             android:layout_centerVertical="true"
             app:srcCompat="@drawable/setup2" />
 
-        <Button
-            android:id="@+id/btn_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="下一步" />
+        <Button style="@style/NextButton" />
 
-        <Button
-            android:id="@+id/btn_previous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:text="上一步" />
+        <Button style="@style/PreviousButton" />
 
     </RelativeLayout>
 

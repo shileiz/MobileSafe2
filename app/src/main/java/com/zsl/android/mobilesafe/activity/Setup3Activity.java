@@ -14,8 +14,6 @@ import com.zsl.android.mobilesafe.R;
 
 public class Setup3Activity extends Activity {
 
-    private Button btnNext;
-    private Button btnPrevious;
     private SharedPreferences mPerf;
     private EditText etSafeNumber;
 
@@ -27,26 +25,22 @@ public class Setup3Activity extends Activity {
         mPerf = getSharedPreferences("config", MODE_PRIVATE);
 
         etSafeNumber = (EditText) findViewById(R.id.et_safenumber);
-        btnNext = (Button) findViewById(R.id.btn_next);
-        btnPrevious = (Button) findViewById(R.id.btn_previous);
+    }
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(TextUtils.isEmpty(etSafeNumber.getText().toString())){
-                    Toast.makeText(Setup3Activity.this, "请输入号码或选择联系人", Toast.LENGTH_SHORT).show();
-                }else {
-                    mPerf.edit().putString("safeNumber", etSafeNumber.getText().toString()).apply();
-                    startActivity(new Intent(Setup3Activity.this, Setup4Activity.class));
-                }
-            }
-        });
+    public void next(View view){
+        if(TextUtils.isEmpty(etSafeNumber.getText().toString())){
+            Toast.makeText(Setup3Activity.this, "请输入号码或选择联系人", Toast.LENGTH_SHORT).show();
+        }else {
+            mPerf.edit().putString("safeNumber", etSafeNumber.getText().toString()).apply();
+            startActivity(new Intent(Setup3Activity.this, Setup4Activity.class));
+            finish();
+            overridePendingTransition(R.anim.to_left_in, R.anim.to_left_out);
+        }
+    }
 
-        btnPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+    public void previous(View view){
+        startActivity(new Intent(Setup3Activity.this, Setup2Activity.class));
+        finish();
+        overridePendingTransition(R.anim.to_right_in, R.anim.to_right_out);
     }
 }

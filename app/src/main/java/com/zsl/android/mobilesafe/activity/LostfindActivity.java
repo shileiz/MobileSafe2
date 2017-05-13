@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.zsl.android.mobilesafe.R;
 
@@ -23,5 +25,10 @@ public class LostfindActivity extends Activity {
             startActivity(new Intent(this, Setup1Activity.class));
             finish();
         }
+    }
+
+    public void reEnter(View view){
+        startActivity(new Intent(this, Setup1Activity.class));
+        finish();
     }
 }
