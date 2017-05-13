@@ -1,14 +1,12 @@
 package com.zsl.android.mobilesafe.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import com.zsl.android.mobilesafe.R;
 
-public class Setup1Activity extends Activity {
+public class Setup1Activity extends BaseSetupActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,9 +14,19 @@ public class Setup1Activity extends Activity {
         setContentView(R.layout.activity_setup1);
     }
 
-    public void next(View view){
+    @Override
+    protected void showPrevious() {
+
+    }
+
+    @Override
+    protected void showNext() {
         startActivity(new Intent(Setup1Activity.this, Setup2Activity.class));
         finish();
         overridePendingTransition(R.anim.to_left_in, R.anim.to_left_out);
+    }
+
+    public void next(View view){
+        showNext();
     }
 }
