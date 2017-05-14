@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.zsl.android.mobilesafe.R;
 
@@ -20,6 +21,17 @@ public class LostfindActivity extends Activity {
         mPerf = getSharedPreferences("config", MODE_PRIVATE);
         boolean alreadySetup = mPerf.getBoolean("alreadySetup", false);
         if(alreadySetup){
+            String safeNumber = mPerf.getString("safeNumber", "");
+            TextView tvSafeNumber = (TextView) findViewById(R.id.tv_safeNumber);
+            tvSafeNumber.setText(safeNumber);
+
+            boolean protect = mPerf.getBoolean("protect", false);
+            ImageView ivProtect = (ImageView)findViewById(R.id.iv_protect);
+            if(protect){
+                ivProtect.setImageResource(R.drawable.lock);
+            }else{
+                ivProtect.setImageResource(R.drawable.unlock);
+            }
 
         }else {
             startActivity(new Intent(this, Setup1Activity.class));

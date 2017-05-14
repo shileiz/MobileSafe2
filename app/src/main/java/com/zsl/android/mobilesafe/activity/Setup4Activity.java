@@ -18,8 +18,14 @@ public class Setup4Activity extends BaseSetupActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup4);
 
-        sivTurnOn = (SettingItemView)findViewById(R.id.siv_turn_on);
+        boolean protect = mPerf.getBoolean("protect", false);
 
+        sivTurnOn = (SettingItemView) findViewById(R.id.siv_turn_on);
+        if (protect) {
+            sivTurnOn.setChecked(true);
+        }else {
+            sivTurnOn.setChecked(false);
+        }
         Button btnNext = (Button) findViewById(R.id.btn_next);
         btnNext.setCompoundDrawables(null, null, null, null);
 
@@ -40,15 +46,20 @@ public class Setup4Activity extends BaseSetupActivity {
         overridePendingTransition(R.anim.to_left_in, R.anim.to_left_out);
     }
 
-    public void next(View view){
+    public void next(View view) {
         showNext();
     }
 
-    public void previous(View view){
+    public void previous(View view) {
         showPrevious();
     }
 
-    public  void turnOn(View view){
+    public void turnOn(View view) {
         sivTurnOn.toggleStatus();
+        if(sivTurnOn.isChecked()){
+            mPerf.edit().putBoolean("protect", true).apply();
+        }else {
+            mPerf.edit().putBoolean("protect", false).apply();
+        }
     }
 }
