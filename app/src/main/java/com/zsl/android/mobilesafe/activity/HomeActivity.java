@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zsl.android.mobilesafe.R;
+import com.zsl.android.mobilesafe.application.BaseApplication;
 import com.zsl.android.mobilesafe.utils.MD5Utils;
 
 import java.util.Set;
@@ -97,7 +98,7 @@ public class HomeActivity extends Activity {
     }
 
     private void showPasswordDialog() {
-        String savedPassword = mPerf.getString("password", null);
+        String savedPassword = mPerf.getString(BaseApplication.PREF_KEY_PASSWORD, null);
         if (savedPassword != null) {
             showInputPasswordDialog();
         } else {
@@ -125,7 +126,7 @@ public class HomeActivity extends Activity {
                 if (TextUtils.isEmpty(password))
                     Toast.makeText(HomeActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
                 else {
-                    String savedPassword = mPerf.getString("password", null);
+                    String savedPassword = mPerf.getString(BaseApplication.PREF_KEY_PASSWORD, null);
                     password = MD5Utils.encode(password);
                     if (password.equals(savedPassword)) {
                         dialog.dismiss();
@@ -163,7 +164,7 @@ public class HomeActivity extends Activity {
                 else {
                     if (password.equals(confirmPassword)) {
                         password = MD5Utils.encode(password);
-                        mPerf.edit().putString("password", password).apply();
+                        mPerf.edit().putString(BaseApplication.PREF_KEY_PASSWORD, password).apply();
                         dialog.dismiss();
                         startActivity(new Intent(HomeActivity.this, LostfindActivity.class));
                     } else Toast.makeText(HomeActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();

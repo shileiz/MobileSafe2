@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zsl.android.mobilesafe.R;
+import com.zsl.android.mobilesafe.application.BaseApplication;
 
 public class Setup3Activity extends BaseSetupActivity {
 
@@ -19,7 +20,7 @@ public class Setup3Activity extends BaseSetupActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup3);
         etSafeNumber = (EditText) findViewById(R.id.et_safenumber);
-        String safeNumber = mPerf.getString("safeNumber","");
+        String safeNumber = mPerf.getString(BaseApplication.PREF_KEY_SAFE_NUMMBER,"");
         etSafeNumber.setText(safeNumber);
     }
 
@@ -50,7 +51,7 @@ public class Setup3Activity extends BaseSetupActivity {
         if (TextUtils.isEmpty(safeNum)) {
             Toast.makeText(Setup3Activity.this, "请输入号码或选择联系人", Toast.LENGTH_SHORT).show();
         } else {
-            mPerf.edit().putString("safeNumber", safeNum).apply();
+            mPerf.edit().putString(BaseApplication.PREF_KEY_SAFE_NUMMBER, safeNum).apply();
             startActivity(new Intent(Setup3Activity.this, Setup4Activity.class));
             finish();
             overridePendingTransition(R.anim.to_left_in, R.anim.to_left_out);

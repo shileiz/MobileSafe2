@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.zsl.android.mobilesafe.R;
+import com.zsl.android.mobilesafe.application.BaseApplication;
 import com.zsl.android.mobilesafe.view.SettingItemView;
 
 
@@ -18,7 +19,7 @@ public class Setup4Activity extends BaseSetupActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup4);
 
-        boolean protect = mPerf.getBoolean("protect", false);
+        boolean protect = mPerf.getBoolean(BaseApplication.PREF_KEY_PROTECTED, false);
 
         sivTurnOn = (SettingItemView) findViewById(R.id.siv_turn_on);
         if (protect) {
@@ -40,7 +41,7 @@ public class Setup4Activity extends BaseSetupActivity {
 
     @Override
     protected void showNext() {
-        mPerf.edit().putBoolean("alreadySetup", true).apply();
+        mPerf.edit().putBoolean(BaseApplication.PREF_KEY_SAFE_ALREADY_SETUP, true).apply();
         startActivity(new Intent(Setup4Activity.this, HomeActivity.class));
         finish();
         overridePendingTransition(R.anim.to_left_in, R.anim.to_left_out);
@@ -57,9 +58,9 @@ public class Setup4Activity extends BaseSetupActivity {
     public void turnOn(View view) {
         sivTurnOn.toggleStatus();
         if(sivTurnOn.isChecked()){
-            mPerf.edit().putBoolean("protect", true).apply();
+            mPerf.edit().putBoolean(BaseApplication.PREF_KEY_PROTECTED, true).apply();
         }else {
-            mPerf.edit().putBoolean("protect", false).apply();
+            mPerf.edit().putBoolean(BaseApplication.PREF_KEY_PROTECTED, false).apply();
         }
     }
 }

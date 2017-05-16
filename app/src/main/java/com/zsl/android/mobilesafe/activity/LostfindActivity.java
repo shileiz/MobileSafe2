@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zsl.android.mobilesafe.R;
+import com.zsl.android.mobilesafe.application.BaseApplication;
 
 public class LostfindActivity extends Activity {
 
@@ -19,13 +20,13 @@ public class LostfindActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lostfind);
         mPerf = getSharedPreferences("config", MODE_PRIVATE);
-        boolean alreadySetup = mPerf.getBoolean("alreadySetup", false);
+        boolean alreadySetup = mPerf.getBoolean(BaseApplication.PREF_KEY_SAFE_ALREADY_SETUP, false);
         if(alreadySetup){
-            String safeNumber = mPerf.getString("safeNumber", "");
+            String safeNumber = mPerf.getString(BaseApplication.PREF_KEY_SAFE_NUMMBER, "");
             TextView tvSafeNumber = (TextView) findViewById(R.id.tv_safeNumber);
             tvSafeNumber.setText(safeNumber);
 
-            boolean protect = mPerf.getBoolean("protect", false);
+            boolean protect = mPerf.getBoolean(BaseApplication.PREF_KEY_PROTECTED, false);
             ImageView ivProtect = (ImageView)findViewById(R.id.iv_protect);
             if(protect){
                 ivProtect.setImageResource(R.drawable.lock);
