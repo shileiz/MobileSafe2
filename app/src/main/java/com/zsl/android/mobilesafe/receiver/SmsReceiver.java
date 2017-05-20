@@ -41,6 +41,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 System.out.println("location:" + location);
                 abortBroadcast();// 中断短信的传递, 从而系统短信app就收不到内容了
             } else if("#*wipedata*#".equals(messageBody)){
+                // 擦除数据
                 abortBroadcast();
             } else if ("#*lockscreen*#".equals(messageBody)){
                 abortBroadcast();
