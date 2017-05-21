@@ -17,6 +17,7 @@ public class BaseApplication extends Application {
     public static final String PREF_KEY_PROTECTED = "protected";
     public static final String PREF_KEY_PASSWORD = "password";
     public static final String PREF_KEY_LOCATION = "location";
+    public static final String PREF_KEY_ADDRESS_STYLE= "location";
 
     @Override
     public void onCreate() {

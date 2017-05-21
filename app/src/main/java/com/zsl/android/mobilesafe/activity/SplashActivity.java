@@ -1,6 +1,5 @@
 package com.zsl.android.mobilesafe.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -15,8 +14,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +33,7 @@ import org.xutils.http.RequestParams;
 import org.xutils.x;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -169,7 +167,6 @@ public class SplashActivity extends Activity {
                 @Override
                 public void onError(Throwable ex, boolean isOnCallback) {
                     Toast.makeText(SplashActivity.this, "xUtils onError" + ex.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.d("zslzsl", ex.getMessage());
                     progressDialog.dismiss();
                     enterHome();
                 }
@@ -202,23 +199,62 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 申请 Sdcard 权限
         PermissionUtils.requestAppPermissions(this);
 
+        // 把数据库文件拷贝到 app 目录
+        copyDB("address.db");
+
+        // 界面初始化
         tvVersion = (TextView) findViewById(R.id.tv_version);
         rlRoot = findViewById(R.id.rl_root);
-
         tvVersion.setText("当前版本：" + getVersionName());
         AlphaAnimation anim = new AlphaAnimation(0.3f, 1f);
         anim.setDuration(2000);
         rlRoot.setAnimation(anim);
 
+        // 检查版本更新
         mPerf = getSharedPreferences("config", MODE_PRIVATE);
         boolean autoUpdate = mPerf.getBoolean(BaseApplication.PREF_KEY_AUTO_UPDATE, true);
-
         if (autoUpdate)
             checkVersion();
         else mHandler.sendEmptyMessageDelayed(CODE_ENTER_HOME, 2000);
+    }
 
+    private void copyDB(String dbName) {
+        // getFilesDir() 得到 app 的私有文件目录，即 data/data/com.zsl.myapp/files/
+        File destFile = new File(getFilesDir(), dbName);// 要拷贝的目标地址
+
+        if (destFile.exists()) {
+            return;
+        }
+
+        FileOutputStream out = null;
+        InputStream in = null;
+
+        try {
+            //  getAssets().open() 打开 assets 里的文件，返回一个 InputStream
+            in = getAssets().open(dbName);
+            out = new FileOutputStream(destFile);
+
+            int len = 0;
+            byte[] buffer = new byte[1024];
+
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private String getVersionName() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:myattrs="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -21,16 +21,25 @@
             android:id="@+id/siv_update"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            myattrs:title="自动更新"
+            myattrs:subtitle_off="自动更新已关闭"
             myattrs:subtitle_on="自动更新已开启"
-            myattrs:subtitle_off="自动更新已关闭"/>
+            myattrs:title="自动更新" />
 
         <com.zsl.android.mobilesafe.view.SettingItemView
+            android:id="@+id/siv_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            myattrs:title="来电归属地"
+            myattrs:subtitle_off="来电归属地已关闭"
             myattrs:subtitle_on="来电归属地已开启"
-            myattrs:subtitle_off="来电归属地已关闭"/>
+            myattrs:title="来电归属地" />
+
+        <com.zsl.android.mobilesafe.view.SettingClickView
+            android:background="@drawable/btn_green_selector"
+            android:id="@+id/scv_address_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            myattrs:subtitle="天空蓝"
+            myattrs:title="归属地悬浮框风格" />
     </LinearLayout>
 
 </LinearLayout>

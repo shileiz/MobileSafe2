@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
 
     <application
         android:name=".application.BaseApplication"
@@ -61,7 +62,14 @@
         <service
             android:name=".service.LocationService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".service.AddressService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".activity.AdvanceActivity" />
+        <activity android:name=".activity.AddressActivity"></activity>
     </application>
 
 </manifest>
