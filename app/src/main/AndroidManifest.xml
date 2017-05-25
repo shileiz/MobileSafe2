@@ -69,7 +69,10 @@
             android:exported="true" />
 
         <activity android:name=".activity.AdvanceActivity" />
-        <activity android:name=".activity.AddressActivity"></activity>
+        <activity android:name=".activity.AddressActivity" />
+        <activity
+            android:name=".activity.SettingPositionActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
     </application>
 
 </manifest>

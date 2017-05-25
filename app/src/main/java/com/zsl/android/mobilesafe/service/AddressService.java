@@ -63,13 +63,23 @@ public class AddressService extends Service {
                 | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
+
         view = View.inflate(this, R.layout.toast_address, null);
+        ((TextView)view.findViewById(R.id.tv_number)).setText(text);
+
+        // 读出悬浮框样式
         mPref = getSharedPreferences("config", MODE_PRIVATE);
         int styleIndex = mPref.getInt(BaseApplication.PREF_KEY_ADDRESS_STYLE, 0);
         int[] Styles = new int[]{R.drawable.call_locate_white, R.drawable.call_locate_orange,
                 R.drawable.call_locate_blue, R.drawable.call_locate_gray, R.drawable.call_locate_green};
         view.setBackgroundResource(Styles[styleIndex]);
-        ((TextView)view.findViewById(R.id.tv_number)).setText(text);
+
+        //读出悬浮框位置
+        int x = mPref.getInt(BaseApplication.PREF_KEY_ADDRESS_POSISTION_X, 0);
+        int y = mPref.getInt(BaseApplication.PREF_KEY_ADDRESS_POSISTION_Y, 0);
+        params.x = x;
+        params.y = y;
+
         mWM.addView(view, params);
     }
 

@@ -1,10 +1,10 @@
 package com.zsl.android.mobilesafe.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
@@ -14,15 +14,17 @@ import com.zsl.android.mobilesafe.service.AddressService;
 import com.zsl.android.mobilesafe.view.SettingClickView;
 import com.zsl.android.mobilesafe.view.SettingItemView;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingActivity extends Activity {
 
     private SettingItemView sivUpdate;
     private SettingItemView sivAddress;
     private SharedPreferences mPref;
     private SettingClickView scvAddressStyle;
+    private SettingClickView scvAddressPosition;
 
     private String[] mAddressStyle = new String[]{"半透明", "活力橙", "卫士蓝", "金属灰", "苹果绿"};
     private int mStyleIndex;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class SettingActivity extends AppCompatActivity {
         initUpdateItem();
         initAddressItem();
         initAddressStyleItem();
+        initAddressPositionItem();
     }
 
     private void initUpdateItem() {
@@ -82,11 +85,23 @@ public class SettingActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mPref.edit().putInt(BaseApplication.PREF_KEY_ADDRESS_STYLE, which).apply();
-                        dialog.dismiss();
+                        mStyleIndex = which;
                         scvAddressStyle.setSubTitle(mAddressStyle[which]);
+                        dialog.dismiss();
                     }
                 });
         builder.setNegativeButton("取消", null);
         builder.show();
     }
+
+    private void initAddressPositionItem() {
+        scvAddressPosition = (SettingClickView) findViewById(R.id.scv_address_position);
+        scvAddressPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SettingActivity.this, SettingPositionActivity.class));
+            }
+        });
+    }
+
 }

@@ -8,9 +8,6 @@ import android.widget.TextView;
 
 import com.zsl.android.mobilesafe.R;
 
-/**
- * Created by Administrator on 2017/5/10 0010.
- */
 
 public class SettingClickView extends RelativeLayout {
     private static final String NAMESPACE = "http://schemas.android.com/apk/res-auto";
