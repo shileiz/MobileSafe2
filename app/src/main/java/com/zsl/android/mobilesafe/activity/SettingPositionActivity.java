@@ -3,7 +3,6 @@ package com.zsl.android.mobilesafe.activity;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -50,9 +49,6 @@ public class SettingPositionActivity extends Activity {
         final int windowWidth = wm.getDefaultDisplay().getWidth();
         final int windowHeight = wm.getDefaultDisplay().getHeight();
 
-        // 获取 ivDrag 宽高
-        final int w = ivDrag.getWidth();
-        final int h = ivDrag.getHeight();
 
         // 隐藏掉一个大框
         if (lastY > windowHeight / 2) {// 上边显示,下边隐藏
@@ -128,7 +124,11 @@ public class SettingPositionActivity extends Activity {
             public void onClick(View v) {
                 if (firstClickTime > 0) {// 发现之前点击过一次
                     if (System.currentTimeMillis() - firstClickTime < 500) {
-                        ivDrag.layout(windowWidth / 2 - w / 2, ivDrag.getTop(), windowWidth / 2 + w / 2, ivDrag.getBottom());
+                        int l = windowWidth / 2 - ivDrag.getWidth() / 2;
+                        int r = windowWidth / 2 + ivDrag.getWidth() / 2;
+                        int t = windowHeight / 2 - ivDrag.getHeight() / 2;
+                        int b = windowHeight / 2 + ivDrag.getHeight() / 2;
+                        ivDrag.layout(l,r,t,b);
                         Toast.makeText(SettingPositionActivity.this, "双击啦!", Toast.LENGTH_SHORT).show();
                         firstClickTime = 0;//重置时间, 重新开始
                         return;
