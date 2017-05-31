@@ -23,4 +23,5 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.zsl.android.mobilesafe", appContext.getPackageName());
     }
+
 }
